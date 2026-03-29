@@ -1,0 +1,37 @@
+/* ── Colour Utilities ────────────────────── */
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+
+/* ── Skeleton ────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Tab Fade In ─────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tab-active {
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Live Dot Pulse ──────────────────────── */
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.3); opacity: 0.5; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.live-pill_dot {
+  animation: pulse 2s infinite;
+}

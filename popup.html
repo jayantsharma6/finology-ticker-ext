@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticker By Finology</title>
+    <link rel="stylesheet" href="styles/popup.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/utilities.css" />
+
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header_top">
+
+            <!-- Replace with logo and Brand name's logo -->
+            <div class="logo">
+                <div class="logo_icon">
+                    <svg width="20" height="20" viewBox="0 0 40 40" fill="none">
+                        <path d="M10 10H30V15H22.5V30H17.5V15H10V10Z" fill="white" />
+                    </svg>
+                </div>
+                <div class="logo_text">
+                    <span class="logo_main">Ticker</span>
+                    <span class="logo_sub">Finology</span>
+                </div>
+            </div>
+
+            <!-- add functionality -->
+            <div class="live-pill">
+                <div class="live-pill_dot"></div>
+                <span>NSE LIVE</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button class="nav_btn nav_btn-active" data-tab="search">Search</button>
+            <button class="nav_btn" data-tab="markets">Markets</button>
+            <button class="nav_btn" data-tab="detection">Detection</button>
+            <button class="nav_btn" data-tab="widgets">Widgets</button>
+        </nav>
+    </header>
+
+    <main class="main">
+
+        <!-- Search Tab -->
+        <section id="tab-search" class="tab tab-active">
+            <div class="search-wrap">
+                <input type="text" id="stock-input" class="search-wrap_input"
+                    placeholder="Search companies (e.g. TCS, INFY)" />
+
+                <div id="search-results" class="search-results"></div>
+            </div>
+
+            <div id="selected-stock">
+                <div class="empty-state">
+                    <div class="empty-state_icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-state__title">No Stock Selected</h3>
+                    <p class="empty-state__sub">Search and click a ticker to see deep insights.</p>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Markets Tab -->
+        <section id="tab-markets" class="tab">
+            <div class="indices-grid" id="indices-list"></div>
+            <div class="section-block">
+                <h4 class="section-block_title section-block_title-positive">Top Gainers</h4>
+                <div id="gainers-list"></div>
+            </div>
+            <div class="section-block">
+                <h4 class="section-block_title section-block_title-negative">Top Losers</h4>
+                <div id="losers-list"></div>
+            </div>
+        </section>
+
+
+        <!-- Detection Tab -->
+        <section id="tab-detection" class="tab">
+            <div class="scan-card">
+                <h3 class="scan-card_title">Smart Detection</h3>
+                <p class="scan-card_sub">Scan the current browser page to find stock mentions instantly.</p>
+                <button id="scan-btn" class="scan-card_btn">START SCAN</button>
+            </div>
+            <div id="scan-results"></div>
+        </section>
+
+
+        <!-- Widgets Tab -->
+        <section id="tab-widgets" class="tab">
+            <div class="empty-state">
+                <h3 class="empty-state_title">Coming Soon</h3>
+                <p class="empty-state_sub">Widgets will be available in a future update.</p>
+            </div>
+        </section>
+    
+    </main>
+
+    <footer class="footer">
+        Data Powered by Finology Ticker
+    </footer>
+
+    <script src="src/popup.js"></script>
+</body>
+
+</html>

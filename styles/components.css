@@ -1,0 +1,129 @@
+/* ── Search ──────────────────────────────── */
+.search-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-wrap_input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+  background: #ffffff;
+}
+
+.search-wrap_input:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  z-index: 100;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  max-height: 240px;
+  overflow-y: auto;
+  display: none;
+}
+
+/* ── Empty State ─────────────────────────── */
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state_icon {
+  background: #eff6ff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.empty-state_title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  margin-bottom: 4px;
+}
+
+.empty-state_sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Scan Card ───────────────────────────── */
+.scan-card {
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-dark));
+  padding: 24px;
+  border-radius: 20px;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.scan-card_title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.scan-card_sub {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.scan-card_btn {
+  width: 100%;
+  background: #ffffff;
+  color: var(--brand-blue);
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.scan-card_btn:hover {
+  background: #eff6ff;
+}
+
+/* ── Section Block ───────────────────────── */
+.section-block {
+  margin-bottom: 20px;
+}
+
+.section-block_title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+
+.section-block_title-positive { color: var(--green); }
+.section-block_title-negative { color: var(--red); }
+
+/* ── Indices Grid ────────────────────────── */
+.indices-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
