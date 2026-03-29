@@ -1,6 +1,7 @@
 /* ── Colour Utilities ────────────────────── */
 .positive { color: var(--green); }
 .negative { color: var(--red); }
+.neutral { color: var(--text-muted); }
 
 /* ── Skeleton ────────────────────────────── */
 .skeleton {
