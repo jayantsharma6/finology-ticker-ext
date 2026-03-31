@@ -19,7 +19,7 @@
 (function () {
   'use strict';
 
-  function init() {
+  function initTabs() {
     const navBtns = document.querySelectorAll('.nav_btn');
     const tabs = document.querySelectorAll('.tab');
 
@@ -36,6 +36,14 @@
         document.getElementById('tab-' + targetTab).classList.add('tab-active');
       });
     });
+  }
+
+
+  async function init() {
+    initTabs();
+    DetectionTab.init();
+    await DataService.init();
+    console.log('[App] Ready.');
   }
 
   document.addEventListener('DOMContentLoaded', init);

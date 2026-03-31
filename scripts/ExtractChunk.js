@@ -6,17 +6,15 @@ function extractChunks() {
   // ------------- Metadata -------------------
   // Page title
   if (document.title && document.title.trim()) {
-    chunks.push({
-      text: document.title.trim().replace(/\s+/g, ' '),
-      tag: 'TITLE',
-    });
+    const text = document.title.trim().replace(/\s+/g, ' ');
+    if (isValidChunk(text, null)) chunks.push(text);
   }
 
   // Meta description
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) {
-    const t = (metaDesc.getAttribute('content') || '').trim();
-    if (t) chunks.push({ text: t.replace(/\s+/g, ' '), tag: 'META' });
+    const text = (metaDesc.getAttribute('content') || '').trim().replace(/\s+/g, ' ');
+    if (isValidChunk(text, null)) chunks.push(text);
   }
 
 
@@ -29,7 +27,7 @@ function extractChunks() {
     // Decision 2: COLLECT — grab text, stop
     if (shouldCollect(el)) {
       const text = getTextWithSpaces(el).trim().replace(/\s+/g, ' ');
-      if (text.length > 1) chunks.push({ text, tag: el.tagName });
+      if (isValidChunk(text, el)) chunks.push(text);
       return;
     }
 
@@ -96,9 +94,10 @@ function hasDirectText(el) {
   for (const child of el.childNodes) {
     if (
       child.nodeType === Node.TEXT_NODE &&
-      child.textContent.trim().length > 1   //update min length condition. what should be the minimum length?
+      child.textContent.trim().length >= 2
     )
-      return true;
+    
+    return true;
   }
   return false;
 }
@@ -180,3 +179,6 @@ const BLOCK_TAGS = new Set([
   'DETAILS','SUMMARY',
   'FORM','FIELDSET'
 ]);
+
+
+extractChunks();
