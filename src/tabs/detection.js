@@ -9,7 +9,7 @@ const DetectionTab = (function () {
     _isScanning = state;
     _scanBtn.disabled = state;
     _scanBtn.innerHTML = state
-      ? '<span class="scan-btn__spinner"></span> Scanning...'
+      ? '<span class="scan-btn_spinner"></span> Scanning...'
       : 'START SCAN';
   }
 
@@ -52,23 +52,27 @@ const DetectionTab = (function () {
     _setScanning(true);
     _resultsEl.innerHTML = '';
 
-    let tabs;
+    // let tabs;
+
+    // // Get currently active tab
+    // tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    // const activeTab = tabs[0];
+
+    let activeTab;
 
     try {
-      // Get currently active tab
-      tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-
+      // activeTab permission grants access to current tab on user gesture
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      activeTab  = tabs[0];
     } catch (err) {
-      console.error('[Detection] Failed to query active tab:', err);
       _showStatus('Could not access the current tab.', true);
       _setScanning(false);
       return;
     }
 
-    const activeTab = tabs[0];
 
-
-    if (!activeTab || !activeTab.url || activeTab.url.startsWith('chrome://') || activeTab.url.startsWith('chrome-extension://')) {
+    if (!activeTab) {
       _showStatus('Cannot scan this page. Navigate to a regular webpage first.', true);
       _setScanning(false);
       return;
@@ -104,7 +108,6 @@ const DetectionTab = (function () {
     const companyMaps = await DataService.getCompanyMaps();
     const matched = MatchService.matchChunks(chunks, companyMaps);
 
-    console.log('[Detection] Companies matched:', matched);
 
     if (matched.length === 0) {
       _showStatus('No companies found on this page.', false);
@@ -114,20 +117,19 @@ const DetectionTab = (function () {
 
     // ── Step 4: fetch stock details for each match ──────────────────────────
     const detailPromises = matched
-      .slice(0, SCAN_CONFIG.maxResults)
+      // .slice(0, SCAN_CONFIG.maxResults)  //when we want to limit results shown.
       .map(function (id) { return DataService.getStockDetail(id); });
 
     const details = await Promise.all(detailPromises);
-    console.log('[Detection] Raw details:', details);
-    
+
     const validDetails = details.filter(Boolean);
 
-    console.log('[Detection] Stock details:', validDetails);
 
 
     await StorageService.set('lastScan', {
       url: activeTab.url,
       chunks: chunks,
+      companies: validDetails,
       scannedAt: Date.now(),
     });
 
@@ -135,10 +137,28 @@ const DetectionTab = (function () {
     _setScanning(false);
   }
 
-  function init() {
+
+  /**
+   * Restores last scan results from storage on popup open.
+   * Only restores if the scan was for the currently active tab's URL.
+   */
+  async function _restoreLastScan() {
+    const last = await StorageService.get('lastScan');
+    if (!last || !last.companies || last.companies.length === 0) return;
+
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const activeTab = tabs[0];
+
+    if (!activeTab || activeTab.url !== last.url) return;
+
+    _renderResults(last.companies);
+  }
+
+  async function init() {
     _scanBtn = document.getElementById('scan-btn');
     _resultsEl = document.getElementById('scan-results');
     _scanBtn.addEventListener('click', _runScan);
+    await _restoreLastScan();
   }
 
   return Object.freeze({ init });

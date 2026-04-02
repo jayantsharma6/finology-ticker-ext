@@ -96,13 +96,11 @@ const MatchService = (function () {
                     const joined = tokens.slice(i, i + wordCount).join(' ');
 
                     if (joined === matchText) {
-                        // Match found — add if not already in results
-                        if (!found.has(id)) {
-                            found.add(id);
-                            i += wordCount;   // skip matched tokens
-                            matched = true;
-                            break;
-                        }
+                        // Match found
+                        found.add(id);
+                        i += wordCount;   // skip matched tokens
+                        matched = true;
+                        break;
                     }
                 }
 

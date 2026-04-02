@@ -24,7 +24,7 @@ const DataService = (function () {
   const _mem = {
     companyList:  null,
     companyMaps:  null,
-    stockDetail:  {},    // keyed by ticker: { INFY: {...}, TCS: {...} }
+    stockDetail:  {},    // keyed by id: { 1: {...}, 2: {...} }
     indices:      null,
     gainers:      null,
     losers:       null,
@@ -76,7 +76,7 @@ const DataService = (function () {
     14:         { id: 14, ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',          price: 1523.40, changePercent: 1.85,   changeAbsolute: 27.65,   sector: 'IT',         exchange: 'NSE' },
     15:         { id: 15, ticker: 'MARUTI',     name: 'Maruti Suzuki India Ltd',       price: 11245.00, changePercent: 0.55,  changeAbsolute: 61.50,   sector: 'Automobile', exchange: 'NSE' },
     16:         { id: 16, ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',        price: 1456.20, changePercent: -0.90,  changeAbsolute: -13.20,  sector: 'Pharma',     exchange: 'NSE' },
-    17:         { id: 17, ticker: 'ONGC',       name: 'Oil & Natural Gas Corp Ltd',    price: 267.45,  changePercent: 2.30,   changeAbsolute: 6.00,    sector: 'Energy',     exchange: 'NSE' },
+    17:         { id: 17, ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd',    price: 267.45,  changePercent: 2.30,   changeAbsolute: 6.00,    sector: 'Energy',     exchange: 'NSE' },
     18:         { id: 18, ticker: 'NTPC',       name: 'NTPC Ltd',                      price: 345.60,  changePercent: 0.65,   changeAbsolute: 2.25,    sector: 'Power',      exchange: 'NSE' },
     19:         { id: 19, ticker: 'POWERGRID',  name: 'Power Grid Corp of India Ltd',  price: 289.75,  changePercent: -0.20,  changeAbsolute: -0.60,   sector: 'Power',      exchange: 'NSE' },
     20:         { id: 20, ticker: 'ULTRACEMCO', name: 'UltraTech Cement Ltd',          price: 9876.50, changePercent: 1.20,   changeAbsolute: 117.00,  sector: 'Cement',     exchange: 'NSE' },
@@ -92,7 +92,7 @@ const DataService = (function () {
   const _DUMMY_GAINERS = [
     { ticker: 'TATAMOTORS', name: 'Tata Motors Ltd',          price: 965.80,   changePercent: 3.45,  changeAbsolute: 32.25,  sector: 'Automobile', exchange: 'NSE' },
     { ticker: 'INFY',       name: 'Infosys Ltd',              price: 1612.45,  changePercent: 2.10,  changeAbsolute: 33.15,  sector: 'IT',         exchange: 'NSE' },
-    { ticker: 'ONGC',       name: 'Oil & Natural Gas Corp Ltd',price: 267.45,  changePercent: 2.30,  changeAbsolute: 6.00,   sector: 'Energy',     exchange: 'NSE' },
+    { ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd',price: 267.45,  changePercent: 2.30,  changeAbsolute: 6.00,   sector: 'Energy',     exchange: 'NSE' },
     { ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',     price: 1523.40,  changePercent: 1.85,  changeAbsolute: 27.65,  sector: 'IT',         exchange: 'NSE' },
     { ticker: 'RELIANCE',   name: 'Reliance Industries Ltd',  price: 2985.40,  changePercent: 1.45,  changeAbsolute: 42.60,  sector: 'Energy',     exchange: 'NSE' },
   ];
@@ -100,7 +100,7 @@ const DataService = (function () {
   const _DUMMY_LOSERS = [
     { ticker: 'ICICIBANK',  name: 'ICICI Bank Ltd',           price: 1089.30,  changePercent: -1.20, changeAbsolute: -13.25, sector: 'Banking',    exchange: 'NSE' },
     { ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',   price: 1456.20,  changePercent: -0.90, changeAbsolute: -13.20, sector: 'Pharma',     exchange: 'NSE' },
-    { ticker: 'TCS',        name: 'Tata Consultancy Services',price: 4120.15,  changePercent: -0.82, changeAbsolute: -34.20, sector: 'IT',         exchange: 'NSE' },
+    { ticker: 'TCS',        name: 'Tata Consultancy Services Ltd',price: 4120.15,  changePercent: -0.82, changeAbsolute: -34.20, sector: 'IT',         exchange: 'NSE' },
     { ticker: 'BAJFINANCE', name: 'Bajaj Finance Ltd',        price: 6842.50,  changePercent: -0.60, changeAbsolute: -41.35, sector: 'Finance',    exchange: 'NSE' },
     { ticker: 'AXISBANK',   name: 'Axis Bank Ltd',            price: 1145.60,  changePercent: -0.45, changeAbsolute: -5.20,  sector: 'Banking',    exchange: 'NSE' },
   ];
@@ -216,11 +216,6 @@ const DataService = (function () {
 
 
   async function _loadStockDetail(id) {
-    // const upper = ticker.toUpperCase();
-
-    console.log('[StockDetail] looking up id:', id, typeof id);
-    console.log('[StockDetail] dummy keys:', Object.keys(_DUMMY_STOCK_DETAIL));
-    console.log('[StockDetail] dummy[id]:', _DUMMY_STOCK_DETAIL[id]);
 
     if (_mem.stockDetail[id]) {
       const fetchMap  = await StorageService.get(STORAGE_KEYS.STOCK_DETAIL_FETCH) || {};
@@ -360,7 +355,7 @@ const DataService = (function () {
   /**
    * Returns full detail for one stock.
    * Cached per ticker, same staleness policy as other market data.
-   * @param   {string} ticker
+   * @param   {number} id
    * @returns {Object|null}
    */
   async function getStockDetail(id) {
