@@ -3,21 +3,6 @@ function extractChunks() {
   const chunks = [];
 
 
-  // ------------- Metadata -------------------
-  // Page title
-  if (document.title && document.title.trim()) {
-    const text = document.title.trim().replace(/\s+/g, ' ');
-    if (isValidChunk(text, null)) chunks.push(text);
-  }
-
-  // Meta description
-  const metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) {
-    const text = (metaDesc.getAttribute('content') || '').trim().replace(/\s+/g, ' ');
-    if (isValidChunk(text, null)) chunks.push(text);
-  }
-
-
   //------------ Walker ----------------
   function walk(el) {
     
