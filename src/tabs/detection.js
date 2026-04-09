@@ -8,9 +8,14 @@ const DetectionTab = (function () {
   function _setScanning(state) {
     _isScanning = state;
     _scanBtn.disabled = state;
-    _scanBtn.innerHTML = state
-      ? '<span class="scan-btn_spinner"></span> Scanning...'
-      : 'START SCAN';
+
+    if (state) {
+      _scanBtn.innerHTML = '<span class="scan-btn_spinner"></span> Scanning...';
+    } else {
+      _scanBtn.innerHTML = '<i data-lucide="maximize"></i> START SCAN';
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
   }
 
   function _showStatus(message, isError) {
@@ -24,26 +29,32 @@ const DetectionTab = (function () {
    * Full StockCard component wired in next sprint.
    */
   function _renderResults(companies) {
-    if (companies.length === 0) {
+    if (!companies || companies.length === 0) {
       _showStatus('No companies found on this page.', false);
       return;
     }
 
-    const items = companies
-      .slice(0, SCAN_CONFIG.maxResults)
-      .map(function (c) {
-        return [
-          '<div class="detection-result">',
-          '  <span class="detection-result_ticker">', c.ticker, '</span>',
-          '  <span class="detection-result_name">', c.name, '</span>',
-          '</div>',
-        ].join('');
-      })
-      .join('');
+    const cards = companies.map(function (c) {
+      return StockCard(c, {
+        locate: false,
+        matchedText: c.matchedText || '',
+      });
+    }).join('');
+
 
     _resultsEl.innerHTML =
       '<p class="scan-status">Found ' + companies.length + ' companies</p>'
-      + items;
+      + cards;
+
+    try { lucide.createIcons(); } catch (e) {}
+
+    // // Bind locate buttons — StockCard only renders HTML, events owned here
+    // _resultsEl.querySelectorAll('[data-action="locate"]').forEach(function (btn) {
+    //   btn.addEventListener('click', function (e) {
+    //     e.stopPropagation();   // prevent any future card-level click handler
+    //     _goToWord(this.dataset.matched);
+    //   });
+    // });
   }
 
 
@@ -52,19 +63,12 @@ const DetectionTab = (function () {
     _setScanning(true);
     _resultsEl.innerHTML = '';
 
-    // let tabs;
-
-    // // Get currently active tab
-    // tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-
-    // const activeTab = tabs[0];
-
     let activeTab;
 
     try {
       // activeTab permission grants access to current tab on user gesture
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      activeTab  = tabs[0];
+      activeTab = tabs[0];
     } catch (err) {
       _showStatus('Could not access the current tab.', true);
       _setScanning(false);

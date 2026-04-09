@@ -25,6 +25,7 @@
     initTabs();
     DetectionTab.init();
     await DataService.init();
+    lucide.createIcons();
     console.log('[App] Ready.');
   }
 

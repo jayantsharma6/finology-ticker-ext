@@ -58,30 +58,30 @@ const DataService = (function () {
 
 
   // Simulates per-ticker detail API response.
-  // In production: GET /api/stock/:ticker
   const _DUMMY_STOCK_DETAIL = {
-    1:          { id: 1,  ticker: 'RELIANCE',   name: 'Reliance Industries Ltd',       price: 2985.40, changePercent: 1.45,   changeAbsolute: 42.60,   sector: 'Energy',     exchange: 'NSE' },
-    2:          { id: 2,  ticker: 'TCS',        name: 'Tata Consultancy Services Ltd',  price: 4120.15, changePercent: -0.82, changeAbsolute: -34.20,  sector: 'IT',         exchange: 'NSE' },
-    3:          { id: 3,  ticker: 'HDFCBANK',   name: 'HDFC Bank Ltd',                 price: 1445.20, changePercent: 0.35,   changeAbsolute: 5.05,    sector: 'Banking',    exchange: 'NSE' },
-    4:          { id: 4,  ticker: 'INFY',       name: 'Infosys Ltd',                   price: 1612.45, changePercent: 2.10,   changeAbsolute: 33.15,   sector: 'IT',         exchange: 'NSE' },
-    5:          { id: 5,  ticker: 'ICICIBANK',  name: 'ICICI Bank Ltd',                price: 1089.30, changePercent: -1.20,  changeAbsolute: -13.25,  sector: 'Banking',    exchange: 'NSE' },
-    6:          { id: 6,  ticker: 'HINDUNILVR', name: 'Hindustan Unilever Ltd',        price: 2345.60, changePercent: 0.75,   changeAbsolute: 17.40,   sector: 'FMCG',       exchange: 'NSE' },
-    7:          { id: 7,  ticker: 'SBIN',       name: 'State Bank of India',           price: 772.15,  changePercent: 0.95,   changeAbsolute: 7.30,    sector: 'Banking',    exchange: 'NSE' },
-    8:          { id: 8,  ticker: 'BAJFINANCE', name: 'Bajaj Finance Ltd',             price: 6842.50, changePercent: -0.60,  changeAbsolute: -41.35,  sector: 'Finance',    exchange: 'NSE' },
-    9:          { id: 9,  ticker: 'TATAMOTORS', name: 'Tata Motors Ltd',               price: 965.80,  changePercent: 3.45,   changeAbsolute: 32.25,   sector: 'Automobile', exchange: 'NSE' },
-    10:         { id: 10, ticker: 'ITC',        name: 'ITC Ltd',                       price: 428.90,  changePercent: 0.0,    changeAbsolute: 0.0,     sector: 'FMCG',       exchange: 'NSE' },
-    11:         { id: 11, ticker: 'AXISBANK',   name: 'Axis Bank Ltd',                 price: 1145.60, changePercent: -0.45,  changeAbsolute: -5.20,   sector: 'Banking',    exchange: 'NSE' },
-    12:         { id: 12, ticker: 'KOTAKBANK',  name: 'Kotak Mahindra Bank Ltd',       price: 1789.30, changePercent: 1.10,   changeAbsolute: 19.50,   sector: 'Banking',    exchange: 'NSE' },
-    13:         { id: 13, ticker: 'WIPRO',      name: 'Wipro Ltd',                     price: 456.75,  changePercent: -0.30,  changeAbsolute: -1.40,   sector: 'IT',         exchange: 'NSE' },
-    14:         { id: 14, ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',          price: 1523.40, changePercent: 1.85,   changeAbsolute: 27.65,   sector: 'IT',         exchange: 'NSE' },
-    15:         { id: 15, ticker: 'MARUTI',     name: 'Maruti Suzuki India Ltd',       price: 11245.00, changePercent: 0.55,  changeAbsolute: 61.50,   sector: 'Automobile', exchange: 'NSE' },
-    16:         { id: 16, ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',        price: 1456.20, changePercent: -0.90,  changeAbsolute: -13.20,  sector: 'Pharma',     exchange: 'NSE' },
-    17:         { id: 17, ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd',    price: 267.45,  changePercent: 2.30,   changeAbsolute: 6.00,    sector: 'Energy',     exchange: 'NSE' },
-    18:         { id: 18, ticker: 'NTPC',       name: 'NTPC Ltd',                      price: 345.60,  changePercent: 0.65,   changeAbsolute: 2.25,    sector: 'Power',      exchange: 'NSE' },
-    19:         { id: 19, ticker: 'POWERGRID',  name: 'Power Grid Corp of India Ltd',  price: 289.75,  changePercent: -0.20,  changeAbsolute: -0.60,   sector: 'Power',      exchange: 'NSE' },
-    20:         { id: 20, ticker: 'ULTRACEMCO', name: 'UltraTech Cement Ltd',          price: 9876.50, changePercent: 1.20,   changeAbsolute: 117.00,  sector: 'Cement',     exchange: 'NSE' },
+    1:  { id: 1,  ticker: 'RELIANCE',   name: 'Reliance Industries Ltd',      price: 2985.40,  changePercent: 1.45,  changeAbsolute: 42.60,  sector: 'Energy',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/RELIANCE'   },
+    2:  { id: 2,  ticker: 'TCS',        name: 'Tata Consultancy Services Ltd', price: 4120.15,  changePercent: -0.82, changeAbsolute: -34.20, sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/TCS'        },
+    3:  { id: 3,  ticker: 'HDFCBANK',   name: 'HDFC Bank Ltd',                price: 1445.20,  changePercent: 0.35,  changeAbsolute: 5.05,   sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HDFCBANK'   },
+    4:  { id: 4,  ticker: 'INFY',       name: 'Infosys Ltd',                  price: 1612.45,  changePercent: 2.10,  changeAbsolute: 33.15,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/INFY'       },
+    5:  { id: 5,  ticker: 'ICICIBANK',  name: 'ICICI Bank Ltd',               price: 1089.30,  changePercent: -1.20, changeAbsolute: -13.25, sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ICICIBANK'  },
+    6:  { id: 6,  ticker: 'HINDUNILVR', name: 'Hindustan Unilever Ltd',       price: 2345.60,  changePercent: 0.75,  changeAbsolute: 17.40,  sector: 'FMCG',       exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HINDUNILVR' },
+    7:  { id: 7,  ticker: 'SBIN',       name: 'State Bank of India',          price: 772.15,   changePercent: 0.95,  changeAbsolute: 7.30,   sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/SBIN'       },
+    8:  { id: 8,  ticker: 'BAJFINANCE', name: 'Bajaj Finance Ltd',            price: 6842.50,  changePercent: -0.60, changeAbsolute: -41.35, sector: 'Finance',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/BAJFINANCE' },
+    9:  { id: 9,  ticker: 'TATAMOTORS', name: 'Tata Motors Ltd',              price: 965.80,   changePercent: 3.45,  changeAbsolute: 32.25,  sector: 'Automobile', exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/TATAMOTORS' },
+    10: { id: 10, ticker: 'ITC',        name: 'ITC Ltd',                      price: 428.90,   changePercent: 0.0,   changeAbsolute: 0.0,    sector: 'FMCG',       exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ITC'        },
+    11: { id: 11, ticker: 'AXISBANK',   name: 'Axis Bank Ltd',                price: 1145.60,  changePercent: -0.45, changeAbsolute: -5.20,  sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/AXISBANK'   },
+    12: { id: 12, ticker: 'KOTAKBANK',  name: 'Kotak Mahindra Bank Ltd',      price: 1789.30,  changePercent: 1.10,  changeAbsolute: 19.50,  sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/KOTAKBANK'  },
+    13: { id: 13, ticker: 'WIPRO',      name: 'Wipro Ltd',                    price: 456.75,   changePercent: -0.30, changeAbsolute: -1.40,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/WIPRO'      },
+    14: { id: 14, ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',         price: 1523.40,  changePercent: 1.85,  changeAbsolute: 27.65,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HCLTECH'    },
+    15: { id: 15, ticker: 'MARUTI',     name: 'Maruti Suzuki India Ltd',      price: 11245.00, changePercent: 0.55,  changeAbsolute: 61.50,  sector: 'Automobile', exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/MARUTI'     },
+    16: { id: 16, ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',       price: 1456.20,  changePercent: -0.90, changeAbsolute: -13.20, sector: 'Pharma',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/SUNPHARMA'  },
+    17: { id: 17, ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd', price: 267.45,   changePercent: 2.30,  changeAbsolute: 6.00,   sector: 'Energy',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ONGC'       },
+    18: { id: 18, ticker: 'NTPC',       name: 'NTPC Ltd',                     price: 345.60,   changePercent: 0.65,  changeAbsolute: 2.25,   sector: 'Power',      exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/NTPC'       },
+    19: { id: 19, ticker: 'POWERGRID',  name: 'Power Grid Corp of India Ltd', price: 289.75,   changePercent: -0.20, changeAbsolute: -0.60,  sector: 'Power',      exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/POWERGRID'  },
+    20: { id: 20, ticker: 'ULTRACEMCO', name: 'UltraTech Cement Ltd',         price: 9876.50,  changePercent: 1.20,  changeAbsolute: 117.00, sector: 'Cement',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ULTRACEMCO' },
   };
 
+  
   const _DUMMY_INDICES = [
     { name: 'NIFTY 50',   value: 22096.75, changePercent: 0.32,  changeAbsolute: 70.50  },
     { name: 'SENSEX',     value: 72831.40, changePercent: 0.26,  changeAbsolute: 187.60 },

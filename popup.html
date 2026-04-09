@@ -92,7 +92,9 @@
             <div class="scan-card">
                 <h3 class="scan-card_title">Smart Detection</h3>
                 <p class="scan-card_sub">Scan the current browser page to find stock mentions instantly.</p>
-                <button id="scan-btn" class="scan-card_btn">START SCAN</button>
+                <button id="scan-btn" class="scan-card_btn">
+                    <i data-lucide="maximize"></i> START SCAN
+                </button>
             </div>
             <div id="scan-results"></div>
         </section>
@@ -113,6 +115,8 @@
     </footer>
 
     
+    <script src="libs/lucide.min.js"></script>
+
     <script src="src/constants/constants.js"></script>
     <script src="src/utils/formatters.js"></script>
 
@@ -121,6 +125,9 @@
     <script src="src/services/CachePolicy.js"></script>
     <script src="src/services/dataService.js"></script>
     <script src="src/services/MatchService.js"></script>
+
+    
+    <script src="src/components/StockCard.js"></script>
 
     <!-- Tabs -->
     <script src="src/tabs/detection.js"></script>

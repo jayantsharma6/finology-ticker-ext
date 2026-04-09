@@ -94,9 +94,13 @@
   padding: 12px;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .scan-card_btn:hover {
@@ -124,6 +128,14 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Scan button icon ────────────────────────────────────────── */
+.scan-card_btn i,
+.scan-card_btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
 }
 
 /* ── Scan status message ──────────────────────────── */
@@ -168,29 +180,169 @@
 }
 
 
-/* ── Detection Results ───────────────────────────── */
-.detection-result {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+
+/* ──────── Stock Card ─────────────────────────────────────── */
+.stock-card {
   background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s ease;
+}
+
+.stock-card:hover {
+  border-color: var(--brand-blue);
+}
+
+/* Top section — identity left, pricing right */
+.stock-card_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 8px;
 }
 
-.detection-result_ticker {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--brand-blue);
-  min-width: 80px;
+.stock-card_identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
-.detection-result_name {
-  font-size: 12px;
+.stock-card_identity-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.stock-card_ticker {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.stock-card_sector {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stock-card_name {
+  font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 190px;
 }
+
+/* Pricing — right aligned */
+.stock-card_pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.stock-card_price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.stock-card_change {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Divider */
+.stock-card_divider {
+  border-top: 1px solid #e2e8f0;;
+  margin-bottom: 10px;
+}
+
+/* Action strip */
+.stock-card_actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stock-card_actions-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Primary action — text button, anchors left */
+.stock-card_action-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-blue);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.stock-card_action-primary:hover {
+  background: #dbeafe;
+}
+
+.stock-card_action-primary i,
+.stock-card_action-primary svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  stroke-width: 2.5;
+}
+
+/* Icon buttons — stack right */
+.stock-card_action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-light);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+
+.stock-card_action-icon i,
+.stock-card_action-icon svg {
+  width: 13px;
+  height: 13px;
+  color: var(--text-muted);
+  stroke-width: 2.5;
+}
+
+.stock-card_action-icon:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.stock-card_action-icon:hover i,
+.stock-card_action-icon:hover svg {
+  color: var(--brand-blue);
+}
+
