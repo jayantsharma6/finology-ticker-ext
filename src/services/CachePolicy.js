@@ -1,13 +1,13 @@
 /**
  * CachePolicy
  *
- * Single source of truth for ALL cache and refresh timing decisions.
- * No other file contains staleness or timing logic.
+ * For all cache and refresh timing decisions.
  *
  * Two policy types:
  *   shouldRefreshMarketData  — for indices, gainers, losers, stock detail
  *   shouldRefreshCompanyList — for company list only
  */
+
 const CachePolicy = (function () {
   'use strict';
 
@@ -16,12 +16,20 @@ const CachePolicy = (function () {
   function _getISTDate() {
     const now   = new Date();
     const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utcMs + 5.5 * 60 * 60 * 1000);
+    return new Date(utcMs + MARKET_CONFIG.TIMEZONE_OFFSET_HRS * 60 * 60 * 1000);
   }
 
-  function _getCurrentISTHour() {
-    return _getISTDate().getHours();
+
+
+  function _minutesSince(timestamp) {
+    return (Date.now() - timestamp) / 60000;
   }
+
+
+  function _hoursSince(timestamp) {
+    return (Date.now() - timestamp) / 3600000;
+  }
+
 
 
   /**
@@ -46,20 +54,13 @@ const CachePolicy = (function () {
   function _getTodayMarketCloseTimestamp() {
     const ist = _getISTDate();
     ist.setHours(MARKET_CONFIG.CLOSE_HOUR, MARKET_CONFIG.CLOSE_MIN, 0, 0);
-    // Convert back to UTC ms
-    return ist.getTime() - 5.5 * 60 * 60 * 1000;
+
+    // IST to UTC ms
+    return ist.getTime() - MARKET_CONFIG.TIMEZONE_OFFSET_HRS * 60 * 60 * 1000;
   }
 
 
 
-  function _minutesSince(timestamp) {
-    return (Date.now() - timestamp) / 60000;
-  }
-
-
-  function _hoursSince(timestamp) {
-    return (Date.now() - timestamp) / 3600000;
-  }
 
   /**
    * Policy for: stock detail, indices, gainers, losers.
@@ -83,7 +84,7 @@ const CachePolicy = (function () {
       return _minutesSince(lastFetch) >= CACHE_CONFIG.MARKET_STALENESS_MINS;
     }
 
-    // Market is closed — check if data is from after today's close
+    // Market closed — check if data is from after today's close
     const todayClose = _getTodayMarketCloseTimestamp();
     if (lastFetch >= todayClose) return false;   // data is post-close, final for day
 
@@ -108,17 +109,19 @@ const CachePolicy = (function () {
 
     if (_hoursSince(lastFetch) >= CACHE_CONFIG.COMPANY_STALENESS_HOURS) return true;
 
-    const istHour = _getCurrentISTHour();
+    const ist     = _getISTDate();
+    const istHour = ist.getHours();
 
     if (istHour >= CACHE_CONFIG.COMPANY_REFRESH_HOUR) {
       const utcMs          = lastFetch + new Date(lastFetch).getTimezoneOffset() * 60000;
-      const istLastFetchHr = new Date(utcMs + 5.5 * 60 * 60 * 1000).getHours();
+      const istLastFetchHr = new Date(utcMs + MARKET_CONFIG.TIMEZONE_OFFSET_HRS * 60 * 60 * 1000).getHours();
       if (istLastFetchHr < CACHE_CONFIG.COMPANY_REFRESH_HOUR) return true;
     }
 
     return false;
   }
 
+  
   return Object.freeze({
     isMarketOpen,
     shouldRefreshMarketData,
