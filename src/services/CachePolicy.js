@@ -11,50 +11,83 @@
 const CachePolicy = (function () {
   'use strict';
 
-  /**
-   * Returns current hour in IST (UTC+5:30).
-   */
-  function _getCurrentISTHour() {
-    const now    = new Date();
-    const utcMs  = now.getTime() + now.getTimezoneOffset() * 60000;
-    const istMs  = utcMs + (5.5 * 60 * 60 * 1000);
-    return new Date(istMs).getHours();
+
+
+  function _getISTDate() {
+    const now   = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + 5.5 * 60 * 60 * 1000);
   }
 
+  function _getCurrentISTHour() {
+    return _getISTDate().getHours();
+  }
+
+
   /**
-   * Returns minutes elapsed since a given timestamp.
-   * @param {number} timestamp — ms since epoch
+   * Returns true if market is currently open.
+   * NSE hours: 9:15 AM — 3:30 PM IST, Mon–Fri.
    */
+  function isMarketOpen() {
+    const ist     = _getISTDate();
+    const day     = ist.getDay();   // 0 = Sun, 6 = Sat
+    const hour    = ist.getHours();
+    const minute  = ist.getMinutes();
+    const inMins  = hour * 60 + minute;
+
+    const openMins  = MARKET_CONFIG.OPEN_HOUR  * 60 + MARKET_CONFIG.OPEN_MIN;
+    const closeMins = MARKET_CONFIG.CLOSE_HOUR * 60 + MARKET_CONFIG.CLOSE_MIN;
+
+    if (day === 0 || day === 6) return false;              // weekend
+    return inMins >= openMins && inMins < closeMins;
+  }
+
+
+  function _getTodayMarketCloseTimestamp() {
+    const ist = _getISTDate();
+    ist.setHours(MARKET_CONFIG.CLOSE_HOUR, MARKET_CONFIG.CLOSE_MIN, 0, 0);
+    // Convert back to UTC ms
+    return ist.getTime() - 5.5 * 60 * 60 * 1000;
+  }
+
+
+
   function _minutesSince(timestamp) {
     return (Date.now() - timestamp) / 60000;
   }
 
-  /**
-   * Returns hours elapsed since a given timestamp.
-   * @param {number} timestamp — ms since epoch
-   */
+
   function _hoursSince(timestamp) {
     return (Date.now() - timestamp) / 3600000;
   }
 
   /**
-   * Policy for: indices, gainers, losers, stock detail.
+   * Policy for: stock detail, indices, gainers, losers.
    *
-   * Refresh if:
-   *   1. No previous fetch timestamp.
-   *   2. During market hours (IST >= MARKET_OPEN_HOUR) AND data older than MARKET_STALENESS_MINS.
-   *   3. Outside market hours AND data older than MARKET_STALENESS_MINS.
+   * Market open:
+   *   - data > 15 mins old → refresh
+   *   - data < 15 mins old → use cache
    *
-   * In both cases the staleness check is the same — the market open hour
-   * condition exists for clarity and future extensibility (e.g. you may
-   * want different staleness windows inside vs outside market hours).
+   * Market closed:
+   *   - last fetch was after today's close → use cache (data is final for the day)
+   *   - last fetch was before today's close → refresh (stale pre-close data)
    *
+   * 
    * @param  {number|null} lastFetch — timestamp or null
    * @returns {boolean}
    */
   function shouldRefreshMarketData(lastFetch) {
     if (!lastFetch) return true;
-    return _minutesSince(lastFetch) >= CACHE_CONFIG.MARKET_STALENESS_MINS;
+
+    if (isMarketOpen()) {
+      return _minutesSince(lastFetch) >= CACHE_CONFIG.MARKET_STALENESS_MINS;
+    }
+
+    // Market is closed — check if data is from after today's close
+    const todayClose = _getTodayMarketCloseTimestamp();
+    if (lastFetch >= todayClose) return false;   // data is post-close, final for day
+
+    return true;   // data is pre-close or from a previous day
   }
 
   /**
@@ -87,6 +120,7 @@ const CachePolicy = (function () {
   }
 
   return Object.freeze({
+    isMarketOpen,
     shouldRefreshMarketData,
     shouldRefreshCompanyList,
   });

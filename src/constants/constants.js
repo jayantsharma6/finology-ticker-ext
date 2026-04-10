@@ -13,14 +13,12 @@ const APP_CONFIG = Object.freeze({
 });
 
 const API_ENDPOINTS = Object.freeze({
-  base:   '',        // will be filled when real API is ready
-  search: '',
-  stockDetail:  '',
-  market: '',
-  indices: '',
-  gainers: '',
-  losers: '',
-  companyList: '',
+  base:         'http://localhost:3000',
+  companyDetail:  '/api/company',   // usage: + '/' + id
+  indices:      '/api/indices',
+  gainers:      '/api/gainers',
+  losers:       '/api/losers',
+  companyList:  '/api/companies',
 });
 
 const SCAN_CONFIG = Object.freeze({
@@ -33,8 +31,6 @@ const SCAN_CONFIG = Object.freeze({
  * Cache configuration.
  *
  * MARKET_STALENESS_MINS   — how old market data can be before re-fetching.
- * MARKET_OPEN_HOUR        — hour (24h, IST) after which force-fetch always runs.
- *                           9 = 9:00 AM, representing market open at 9:15 AM.
  *
  * COMPANY_STALENESS_HOURS — how old company list can be before re-fetching.
  * COMPANY_REFRESH_HOUR    — hour (24h, IST) after which force-fetch always runs.
@@ -42,10 +38,17 @@ const SCAN_CONFIG = Object.freeze({
  */
 const CACHE_CONFIG = Object.freeze({
   MARKET_STALENESS_MINS:   15,
-  MARKET_OPEN_HOUR:        9,
 
   COMPANY_STALENESS_HOURS: 24,
   COMPANY_REFRESH_HOUR:    7,
+});
+
+const MARKET_CONFIG = Object.freeze({
+  OPEN_HOUR:    9,
+  OPEN_MIN:     15,
+  CLOSE_HOUR:   15,
+  CLOSE_MIN:    30,
+  TIMEZONE_OFFSET_HRS: 5.5,   // IST = UTC+5:30
 });
 
 
@@ -67,4 +70,23 @@ const STORAGE_KEYS = Object.freeze({
 
   STOCK_DETAIL:       'stockDetail',
   STOCK_DETAIL_FETCH: 'stockDetailFetch',
+});
+
+
+
+/*
+ * IndexedDB configuration for company list and maps.
+ */
+const DB_CONFIG = Object.freeze({
+  name:    'TickerDB',
+  version: 1,
+  stores:  Object.freeze({
+
+    COMPANY_LIST: Object.freeze({
+      name:    'companyList',
+      keyPath: 'id',
+      indexes: [],   // could be used later.
+    }),
+
+  }),
 });

@@ -1,20 +1,3 @@
-/**
- * DataService
- *
- * Single source for all data in the extension.
- * Every tab and component calls this — nothing else touches raw data.
- *
- * Five independent data units, each with its own fetch, cache, and storage:
- *   - Company List
- *   - Stock Detail  (per ticker)
- *   - Indices
- *   - Gainers
- *   - Losers
- *
- * To connect a real API later:
- *   Replace the body of the corresponding _fetch* function only.
- *   Cache logic, storage, and public API remain untouched.
- */
 const DataService = (function () {
   'use strict';
 
@@ -24,120 +7,12 @@ const DataService = (function () {
   const _mem = {
     companyList:  null,
     companyMaps:  null,
-    stockDetail:  {},    // keyed by id: { 1: {...}, 2: {...} }
+    companyDetail:  {},    // keyed by id: { 1: {...}, 2: {...} }
     indices:      null,
     gainers:      null,
     losers:       null,
   };
 
-  // ── Dummy Data ────────────────────────────────────────────────────────────
-  // Each block maps to exactly one future API endpoint.
-
-  const _DUMMY_COMPANY_LIST = [
-    { id: 1,  name: 'Reliance Industries Ltd',        ticker: 'RELIANCE'   },
-    { id: 2,  name: 'Tata Consultancy Services Ltd',  ticker: 'TCS'        },
-    { id: 3,  name: 'HDFC Bank Ltd',                  ticker: 'HDFCBANK'   },
-    { id: 4,  name: 'Infosys Ltd',                    ticker: 'INFY'       },
-    { id: 5,  name: 'ICICI Bank Ltd',                 ticker: 'ICICIBANK'  },
-    { id: 6,  name: 'Hindustan Unilever Ltd',         ticker: 'HINDUNILVR' },
-    { id: 7,  name: 'State Bank of India',            ticker: 'SBIN'       },
-    { id: 8,  name: 'Bajaj Finance Ltd',              ticker: 'BAJFINANCE' },
-    { id: 9,  name: 'Tata Motors Ltd',                ticker: 'TATAMOTORS' },
-    { id: 10, name: 'ITC Ltd',                        ticker: 'ITC'        },
-    { id: 11, name: 'Axis Bank Ltd',                  ticker: 'AXISBANK'   },
-    { id: 12, name: 'Kotak Mahindra Bank Ltd',        ticker: 'KOTAKBANK'  },
-    { id: 13, name: 'Wipro Ltd',                      ticker: 'WIPRO'      },
-    { id: 14, name: 'HCL Technologies Ltd',           ticker: 'HCLTECH'    },
-    { id: 15, name: 'Maruti Suzuki India Ltd',        ticker: 'MARUTI'     },
-    { id: 16, name: 'Sun Pharmaceutical Ltd',         ticker: 'SUNPHARMA'  },
-    { id: 17, name: 'Oil and Natural Gas Corp Ltd',   ticker: 'ONGC'       },
-    { id: 18, name: 'NTPC Ltd',                       ticker: 'NTPC'       },
-    { id: 19, name: 'Power Grid Corp of India Ltd',   ticker: 'POWERGRID'  },
-    { id: 20, name: 'UltraTech Cement Ltd',           ticker: 'ULTRACEMCO' },
-  ];
-
-
-  // Simulates per-ticker detail API response.
-  const _DUMMY_STOCK_DETAIL = {
-    1:  { id: 1,  ticker: 'RELIANCE',   name: 'Reliance Industries Ltd',      price: 2985.40,  changePercent: 1.45,  changeAbsolute: 42.60,  sector: 'Energy',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/RELIANCE'   },
-    2:  { id: 2,  ticker: 'TCS',        name: 'Tata Consultancy Services Ltd', price: 4120.15,  changePercent: -0.82, changeAbsolute: -34.20, sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/TCS'        },
-    3:  { id: 3,  ticker: 'HDFCBANK',   name: 'HDFC Bank Ltd',                price: 1445.20,  changePercent: 0.35,  changeAbsolute: 5.05,   sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HDFCBANK'   },
-    4:  { id: 4,  ticker: 'INFY',       name: 'Infosys Ltd',                  price: 1612.45,  changePercent: 2.10,  changeAbsolute: 33.15,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/INFY'       },
-    5:  { id: 5,  ticker: 'ICICIBANK',  name: 'ICICI Bank Ltd',               price: 1089.30,  changePercent: -1.20, changeAbsolute: -13.25, sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ICICIBANK'  },
-    6:  { id: 6,  ticker: 'HINDUNILVR', name: 'Hindustan Unilever Ltd',       price: 2345.60,  changePercent: 0.75,  changeAbsolute: 17.40,  sector: 'FMCG',       exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HINDUNILVR' },
-    7:  { id: 7,  ticker: 'SBIN',       name: 'State Bank of India',          price: 772.15,   changePercent: 0.95,  changeAbsolute: 7.30,   sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/SBIN'       },
-    8:  { id: 8,  ticker: 'BAJFINANCE', name: 'Bajaj Finance Ltd',            price: 6842.50,  changePercent: -0.60, changeAbsolute: -41.35, sector: 'Finance',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/BAJFINANCE' },
-    9:  { id: 9,  ticker: 'TATAMOTORS', name: 'Tata Motors Ltd',              price: 965.80,   changePercent: 3.45,  changeAbsolute: 32.25,  sector: 'Automobile', exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/TATAMOTORS' },
-    10: { id: 10, ticker: 'ITC',        name: 'ITC Ltd',                      price: 428.90,   changePercent: 0.0,   changeAbsolute: 0.0,    sector: 'FMCG',       exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ITC'        },
-    11: { id: 11, ticker: 'AXISBANK',   name: 'Axis Bank Ltd',                price: 1145.60,  changePercent: -0.45, changeAbsolute: -5.20,  sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/AXISBANK'   },
-    12: { id: 12, ticker: 'KOTAKBANK',  name: 'Kotak Mahindra Bank Ltd',      price: 1789.30,  changePercent: 1.10,  changeAbsolute: 19.50,  sector: 'Banking',    exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/KOTAKBANK'  },
-    13: { id: 13, ticker: 'WIPRO',      name: 'Wipro Ltd',                    price: 456.75,   changePercent: -0.30, changeAbsolute: -1.40,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/WIPRO'      },
-    14: { id: 14, ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',         price: 1523.40,  changePercent: 1.85,  changeAbsolute: 27.65,  sector: 'IT',         exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/HCLTECH'    },
-    15: { id: 15, ticker: 'MARUTI',     name: 'Maruti Suzuki India Ltd',      price: 11245.00, changePercent: 0.55,  changeAbsolute: 61.50,  sector: 'Automobile', exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/MARUTI'     },
-    16: { id: 16, ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',       price: 1456.20,  changePercent: -0.90, changeAbsolute: -13.20, sector: 'Pharma',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/SUNPHARMA'  },
-    17: { id: 17, ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd', price: 267.45,   changePercent: 2.30,  changeAbsolute: 6.00,   sector: 'Energy',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ONGC'       },
-    18: { id: 18, ticker: 'NTPC',       name: 'NTPC Ltd',                     price: 345.60,   changePercent: 0.65,  changeAbsolute: 2.25,   sector: 'Power',      exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/NTPC'       },
-    19: { id: 19, ticker: 'POWERGRID',  name: 'Power Grid Corp of India Ltd', price: 289.75,   changePercent: -0.20, changeAbsolute: -0.60,  sector: 'Power',      exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/POWERGRID'  },
-    20: { id: 20, ticker: 'ULTRACEMCO', name: 'UltraTech Cement Ltd',         price: 9876.50,  changePercent: 1.20,  changeAbsolute: 117.00, sector: 'Cement',     exchange: 'NSE', tickerUrl: 'https://ticker.finology.in/company/ULTRACEMCO' },
-  };
-
-  
-  const _DUMMY_INDICES = [
-    { name: 'NIFTY 50',   value: 22096.75, changePercent: 0.32,  changeAbsolute: 70.50  },
-    { name: 'SENSEX',     value: 72831.40, changePercent: 0.26,  changeAbsolute: 187.60 },
-    { name: 'BANK NIFTY', value: 46594.20, changePercent: -0.15, changeAbsolute: -70.20 },
-  ];
-
-  // API returns pre-sorted lists — dummy reflects same contract.
-  const _DUMMY_GAINERS = [
-    { ticker: 'TATAMOTORS', name: 'Tata Motors Ltd',          price: 965.80,   changePercent: 3.45,  changeAbsolute: 32.25,  sector: 'Automobile', exchange: 'NSE' },
-    { ticker: 'INFY',       name: 'Infosys Ltd',              price: 1612.45,  changePercent: 2.10,  changeAbsolute: 33.15,  sector: 'IT',         exchange: 'NSE' },
-    { ticker: 'ONGC',       name: 'Oil and Natural Gas Corp Ltd',price: 267.45,  changePercent: 2.30,  changeAbsolute: 6.00,   sector: 'Energy',     exchange: 'NSE' },
-    { ticker: 'HCLTECH',    name: 'HCL Technologies Ltd',     price: 1523.40,  changePercent: 1.85,  changeAbsolute: 27.65,  sector: 'IT',         exchange: 'NSE' },
-    { ticker: 'RELIANCE',   name: 'Reliance Industries Ltd',  price: 2985.40,  changePercent: 1.45,  changeAbsolute: 42.60,  sector: 'Energy',     exchange: 'NSE' },
-  ];
-
-  const _DUMMY_LOSERS = [
-    { ticker: 'ICICIBANK',  name: 'ICICI Bank Ltd',           price: 1089.30,  changePercent: -1.20, changeAbsolute: -13.25, sector: 'Banking',    exchange: 'NSE' },
-    { ticker: 'SUNPHARMA',  name: 'Sun Pharmaceutical Ltd',   price: 1456.20,  changePercent: -0.90, changeAbsolute: -13.20, sector: 'Pharma',     exchange: 'NSE' },
-    { ticker: 'TCS',        name: 'Tata Consultancy Services Ltd',price: 4120.15,  changePercent: -0.82, changeAbsolute: -34.20, sector: 'IT',         exchange: 'NSE' },
-    { ticker: 'BAJFINANCE', name: 'Bajaj Finance Ltd',        price: 6842.50,  changePercent: -0.60, changeAbsolute: -41.35, sector: 'Finance',    exchange: 'NSE' },
-    { ticker: 'AXISBANK',   name: 'Axis Bank Ltd',            price: 1145.60,  changePercent: -0.45, changeAbsolute: -5.20,  sector: 'Banking',    exchange: 'NSE' },
-  ];
-
-  // ── Private: Raw fetch functions ──────────────────────────────────────────
-  // These are the ONLY functions to update when real APIs are ready.
-  // Each maps 1:1 to one API endpoint.
-
-  async function _fetchCompanyList() {
-    // FUTURE: const res = await fetch(API_ENDPOINTS.companyList);
-    // FUTURE: return await res.json();
-    return _DUMMY_COMPANY_LIST;
-  }
-
-  async function _fetchStockDetail(id) {
-    // FUTURE: const res = await fetch(API_ENDPOINTS.stockDetail + '/' + id);
-    // FUTURE: return await res.json();
-    return _DUMMY_STOCK_DETAIL[id] || null;
-  }
-
-  async function _fetchIndices() {
-    // FUTURE: const res = await fetch(API_ENDPOINTS.indices);
-    // FUTURE: return await res.json();
-    return _DUMMY_INDICES;
-  }
-
-  async function _fetchGainers() {
-    // FUTURE: const res = await fetch(API_ENDPOINTS.gainers);
-    // FUTURE: return await res.json();
-    return _DUMMY_GAINERS;
-  }
-
-  async function _fetchLosers() {
-    // FUTURE: const res = await fetch(API_ENDPOINTS.losers);
-    // FUTURE: return await res.json();
-    return _DUMMY_LOSERS;
-  }
 
   // ── Private: Load with cache logic ───────────────────────────────────────
   // One _load* function per data unit.
@@ -147,17 +22,18 @@ const DataService = (function () {
     if (_mem.companyList) return _mem.companyList;
 
     const lastFetch = await StorageService.get(STORAGE_KEYS.COMPANY_LAST_FETCH);
+    const needsRefresh = CachePolicy.shouldRefreshCompanyList(lastFetch);
 
-    if (!CachePolicy.shouldRefreshCompanyList(lastFetch)) {
-      const stored = await StorageService.get(STORAGE_KEYS.COMPANY_LIST);
-      if (stored) {
+    if (!needsRefresh) {
+      const stored = await IndexedDBService.getALL(DB_CONFIG.COMPANY_LIST.name);
+      if (stored && stored.length > 0) {
         _mem.companyList = stored;
         _mem.companyMaps = _buildCompanyMaps(stored);
         return stored;
       }
     }
 
-    const data = await _fetchCompanyList();
+    const data = await ApiService.fetchCompanyList();
     _mem.companyList = data;
     _mem.companyMaps = _buildCompanyMaps(data);
     await StorageService.set(STORAGE_KEYS.COMPANY_LIST, data);
@@ -192,9 +68,9 @@ const DataService = (function () {
 
 
   /**
- * Builds Map1 and Map2 from company list.
- * To add a new matchable field — add one _registerTerm call below.
- */
+   * Builds Map1 and Map2 from company list.
+   * To add a new matchable field — add one _registerTerm call below.
+   */
   function _buildCompanyMaps(companyList) {
     const charFirstWord = new Map();
     const firstWordMap = new Map();
@@ -234,7 +110,7 @@ const DataService = (function () {
       return storedMap[id];
     }
 
-    const data = await _fetchStockDetail(id);
+    const data = await ApiService.fetchCompanyDetail(id);
     if (!data) return null;
 
     _mem.stockDetail[id]  = data;
@@ -259,7 +135,7 @@ const DataService = (function () {
       }
     }
 
-    const data = await _fetchIndices();
+    const data = await ApiService.fetchIndices();
     _mem.indices = data;
     await StorageService.set(STORAGE_KEYS.INDICES, data);
     await StorageService.set(STORAGE_KEYS.INDICES_LAST_FETCH, Date.now());
@@ -279,7 +155,7 @@ const DataService = (function () {
       }
     }
 
-    const data = await _fetchGainers();
+    const data = await ApiService.fetchGainers();
     _mem.gainers = data;
     await StorageService.set(STORAGE_KEYS.GAINERS, data);
     await StorageService.set(STORAGE_KEYS.GAINERS_LAST_FETCH, Date.now());
@@ -299,7 +175,7 @@ const DataService = (function () {
       }
     }
 
-    const data = await _fetchLosers();
+    const data = await ApiService.fetchLosers();
     _mem.losers = data;
     await StorageService.set(STORAGE_KEYS.LOSERS, data);
     await StorageService.set(STORAGE_KEYS.LOSERS_LAST_FETCH, Date.now());
