@@ -19,24 +19,26 @@ const DataService = (function () {
   // Pattern: check memory → check storage → fetch fresh.
 
   async function _loadCompanyList() {
-    if (_mem.companyList) return _mem.companyList;
+    // if (_mem.companyList) return _mem.companyList;
 
     const lastFetch = await StorageService.get(STORAGE_KEYS.COMPANY_LAST_FETCH);
     const needsRefresh = CachePolicy.shouldRefreshCompanyList(lastFetch);
 
     if (!needsRefresh) {
-      const stored = await IndexedDBService.getALL(DB_CONFIG.COMPANY_LIST.name);
+      const stored = await IndexedDBService.getAll(DB_CONFIG.stores.COMPANY_LIST.name);
       if (stored && stored.length > 0) {
-        _mem.companyList = stored;
+        // _mem.companyList = stored;
         _mem.companyMaps = _buildCompanyMaps(stored);
         return stored;
       }
     }
 
     const data = await ApiService.fetchCompanyList();
-    _mem.companyList = data;
+    // _mem.companyList = data;
     _mem.companyMaps = _buildCompanyMaps(data);
-    await StorageService.set(STORAGE_KEYS.COMPANY_LIST, data);
+    await IndexedDBService.clearStore(DB_CONFIG.stores.COMPANY_LIST.name);
+    await IndexedDBService.upsertBulk(DB_CONFIG.stores.COMPANY_LIST.name, data);
+    // await StorageService.set(STORAGE_KEYS.COMPANY_LIST, data);
     await StorageService.set(STORAGE_KEYS.COMPANY_LAST_FETCH, Date.now());
     return data;
   }
@@ -93,11 +95,11 @@ const DataService = (function () {
 
   async function _loadStockDetail(id) {
 
-    if (_mem.stockDetail[id]) {
+    if (_mem.companyDetail[id]) {
       const fetchMap  = await StorageService.get(STORAGE_KEYS.STOCK_DETAIL_FETCH) || {};
       const lastFetch = fetchMap[id] || null;
       if (!CachePolicy.shouldRefreshMarketData(lastFetch)) {
-        return _mem.stockDetail[id];
+        return _mem.companyDetail[id];
       }
     }
 
@@ -106,14 +108,14 @@ const DataService = (function () {
     const lastFetch  = fetchMap[id] || null;
 
     if (!CachePolicy.shouldRefreshMarketData(lastFetch) && storedMap[id]) {
-      _mem.stockDetail[id] = storedMap[id];
+      _mem.companyDetail[id] = storedMap[id];
       return storedMap[id];
     }
 
     const data = await ApiService.fetchCompanyDetail(id);
     if (!data) return null;
 
-    _mem.stockDetail[id]  = data;
+    _mem.companyDetail[id]  = data;
     storedMap[id]         = data;
     fetchMap[id]          = Date.now();
 
