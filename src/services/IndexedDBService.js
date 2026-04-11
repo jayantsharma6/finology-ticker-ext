@@ -78,7 +78,7 @@ const IndexedDBService = (function () {
     }
 
 
-    async function getALL(storeName) {
+    async function getAll(storeName) {
 
         const db = await open();
         const tx = db.transaction(storeName, 'readonly');
@@ -126,11 +126,11 @@ const IndexedDBService = (function () {
         const tx = db.transaction(storeName, 'readwrite');
         const store = tx.objectStore(storeName);
 
-        store.put(value);   // put() will add or update based on keyPath
+        const request = store.put(value);   // put() will add or update based on keyPath
 
         return new Promise(function (resolve, reject) {
             tx.oncomplete = function () {
-                resolve(request.result);
+                resolve(true);
             };
 
             tx.onerror = function () {
@@ -155,7 +155,7 @@ const IndexedDBService = (function () {
 
         return new Promise(function (resolve, reject) {
             tx.oncomplete = function () {
-                resolve();
+                resolve(true);
             };
 
             tx.onerror = function () {
@@ -181,7 +181,7 @@ const IndexedDBService = (function () {
         return new Promise(async function (resolve, reject) {
 
             tx.oncomplete = function () {
-                resolve();
+                resolve(true);
             };
 
             tx.onerror = function () {
@@ -207,7 +207,7 @@ const IndexedDBService = (function () {
 
         return new Promise(function (resolve, reject) {
             tx.oncomplete = function () {
-                resolve();
+                resolve(true);
             };
 
             tx.onerror = function () {
@@ -226,7 +226,7 @@ const IndexedDBService = (function () {
 
     return Object.freeze({
         open,
-        getALL,
+        getAll,
         getById,
         upsert,
         upsertBulk,

@@ -8,8 +8,10 @@ const ApiService = (function () {
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(
-                '[ApiService] HTTP ' + response.status + ' for ' + url
+            throw new ApiError(
+                'HTTP ' + response.status + ' for ' + url,
+                response.status,
+                url
             );
         }
 
@@ -19,31 +21,62 @@ const ApiService = (function () {
 
     // fetches full company list
     async function fetchCompanyList() {
-        return _get(API_ENDPOINTS.companyList);
+        try {
+            const data = await _get(API_ENDPOINTS.companyList);
+            return data;
+        } catch (error) {
+            console.error('[ApiService] Error fetching company list:', error);
+            throw error;
+        }
     }
 
 
     // fetches detail for a single company by company ID
     async function fetchCompanyDetail(id) {
-        return _get(API_ENDPOINTS.companyDetail + '/' + id);
+        try {
+            const data = await _get(API_ENDPOINTS.companyDetail + '/' + id);
+            return data;
+        } catch (error) {
+            if(error.isApiError && error.status === 404) return null;  // return null if company not found
+            console.error('[ApiService] Error fetching company detail:', id, error.message);
+            throw error;
+        }
     }
 
 
     // fetches market indices data
     async function fetchIndices() {
-        return _get(API_ENDPOINTS.indices);
+        try {
+            const data = await _get(API_ENDPOINTS.indices);
+            return data;
+        } catch (error) {
+            console.error('[ApiService] Error fetching indices:', error);
+            throw error;
+        }
     }
 
 
     // fetches top gainers
     async function fetchGainers() {
-        return _get(API_ENDPOINTS.gainers);
+        try {
+            const data = await _get(API_ENDPOINTS.gainers);
+            return data;
+        } catch (error) {
+            console.error('[ApiService] Error fetching gainers:', error);
+            throw error;
+        }
     }
 
 
     // fetches top losers
     async function fetchLosers() {
-        return _get(API_ENDPOINTS.losers);
+        try {
+            const data = await _get(API_ENDPOINTS.losers);
+            return data;
+        } catch (error) {
+            console.error('[ApiService] Error fetching losers:', error);
+            throw error;
+        }
     }
 
 
